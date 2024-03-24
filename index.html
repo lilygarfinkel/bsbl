@@ -17,14 +17,31 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <canvas id="myChart" width="600" height="600"></canvas>
   <script>
-  // Fetch the JSON data
-   fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/bsbl.json') .then(response => response.json()) .then(data => { 
-    // Get the canvas element 
-    const canvas = document.getElementById('myChart');
-    console.log(data);
-     // Create a new chart and pass the data
-      new Chart(canvas, { type: 'bar', data: {labels: ['aries', 'pisces', 'virgo', 'aquarius', 'taurus', 'capricorn', 'cancer', 'libra', 'saggitarius', 'scorpio', 'gemini', 'leo']}, 
-      options: { scales: { x: { stacked: true }, y: { stacked: true } } } }); }) 
-            .catch(error => console.error(error));
+    // Fetch the JSON data
+    // fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/bsbl.json').then(response => response.json()).then(data => {
+      fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/counts.json').then(response => response.json()).then(count => {
+        
+        // Get the canvas element 
+        const canvas = document.getElementById('myChart');
+        console.log(count.data);
+        // Create a new chart and pass the data
+        new Chart(canvas, {
+          type: 'bar',
+          data: {
+            labels: ['aries', 'pisces', 'virgo', 'aquarius', 'taurus', 'capricorn', 'cancer', 'libra', 'saggitarius', 'scorpio', 'gemini', 'leo'],
+            datasets: [{
+              data: count.data
+            }]
+          },
+          // options: {
+          //   scales: {
+          //     x: { stacked: true },
+          //     y: { stacked: true }
+          //   }
+          // }
+        });
+      })
+    // })
+      .catch(error => console.error(error));
   </script>
 </body>
