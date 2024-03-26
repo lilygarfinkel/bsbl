@@ -301,18 +301,7 @@
           },
 
           options: {
-            tooltip: {
-              callbacks: {
-                afterbody: function (items) {
-                  return 'Total: ' + items.reduce((a, b) => a + b.parsed.y, 0)
-
-                }
-              }
-            },
-            // parsing: {
-            //   xAxisKey: teams.team,
-            //   yAxisKey: teams.count
-            // },
+            
             scales: {
               x: { stacked: true },
               y: { stacked: true }
@@ -324,16 +313,32 @@
                   boxWidth: 15,
                   boxHeight: 15,
                 }
-
-
-              }
+              },
+              tooltip: {
+                mode: 'index',
+                bodySpacing:1,
+                usePointStyle: true,
+                callbacks: {
+                  labelPointStyle: function (context) {
+                    return {
+                      pointStyle: 'circle',
+                      rotation: 0
+                    };
+                  },
+                  footer: function(items) {
+                    total = items.reduce((a, b) => a + b.parsed.y, 0);
+                    console.log(total)
+            return 'Total: ' + total
+          }
+                }
+              },
             },
 
           }
 
         }
         );
-      })
+      }).catch(error => console.error(error));
     }).catch(error => console.error(error));
   </script>
 </body>
