@@ -74,23 +74,23 @@
 
       // Prepare data
       const sign = Object.keys(bysign);
-      const groups = Object.keys(bysign).map(key => ({key: key, data: bysign[key]}));
-    
+      const groups = Object.keys(bysign).map(key => ({ key: key, data: bysign[key] }));
 
-      const group=[]
-      for (s in groups){
+
+      const group = []
+      for (s in groups) {
         let g = {}
         g['key'] = groups[s].key;
-        for (t in groups[s].data){
-         g[t] = groups[s].data[t];
+        for (t in groups[s].data) {
+          g[t] = groups[s].data[t];
 
         }
         group.push(g)
       }
-// console.log(group)
-//       console.log(sign)
-//       // console.log(team_data)
-//       console.log(groups)
+      // console.log(group)
+      //       console.log(sign)
+      //       // console.log(team_data)
+      //       console.log(groups)
 
       var subgroups = ["angels", "astros", "athletics", "blue jays", "braves", "brewers", "cardinals", "cubs", " diamondbacks", "dodgers", "giants", "guardians", "mariners", "marlins", "mets", "nationals", "orioles", "padres", "pirates", "phillies", "rangers", "rays", "reds", "red sox", "rockies", "royals", "tigers", "twins", "white sox", "yankees"]
       // console.log(subgroups)
@@ -122,8 +122,38 @@
         .keys(subgroups)
 
       var stackedData = stackGen(group)
+      // ----------------
+      // Create a tooltip
+      // ----------------
+      var tooltip = d3.select("#my_dataviz")
+        .append("div")
+        .style("opacity", 0)
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "1px")
+        .style("border-radius", "5px")
+        .style("padding", "10px")
 
-      console.log(stackedData)
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var mouseover = function (d) {
+        var subgroupName = d3.select(this.parentNode).datum().key;
+        var subgroupValue = d.data[subgroupName];
+        tooltip
+          .html("team: " + subgroupName + "<br>" + "count: " + subgroupValue)
+          .style("opacity", 1)
+      }
+      var mousemove = function (d) {
+        tooltip
+          .style("left", (d3.mouse(this)[0] + 90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+          .style("top", (d3.mouse(this)[1]) + "px")
+          .style("width", '100px')
+      }
+      var mouseleave = function (d) {
+        tooltip
+          .style("opacity", 0)
+      }
+      // console.log(stackedData)
       // Show the bars
       // }); 
       svg.append("g")
@@ -131,15 +161,18 @@
         // Enter in the stack data = loop key per key = group per group
         .data(stackedData)
         .enter().append("g")
-        .attr("fill", function (d) {return color(d.key); })
+        .attr("fill", function (d) { return color(d.key); })
         .selectAll("rect")
         // enter a second time = loop signs per signs to add all rectangles
         .data(function (d) { console.log(d); return d; })
-          .enter().append("rect")
-          .attr("x", function (d) {if(typeof d.data === 'string'){return;}else{return x(d.data.key);}})
-          .attr("y", function (d) { if(Number.isNaN(y(d[1]))){return} else{ return y(d[1]);} })
-          .attr("height", function (d){if(Number.isNaN(y(d[1]))){return} else{return( y(d[0]) - y(d[1]));}})
-          .attr("width", x.bandwidth())
+        .enter().append("rect")
+        .attr("x", function (d) { if (typeof d.data === 'string') { return; } else { return x(d.data.key); } })
+        .attr("y", function (d) { if (Number.isNaN(y(d[1]))) { return } else { return y(d[1]); } })
+        .attr("height", function (d) { if (Number.isNaN(y(d[1]))) { return } else { return (y(d[0]) - y(d[1])); } })
+        .attr("width", x.bandwidth())
+        .on("mouseover", mouseover)
+      .on("mousemove", mousemove)
+      .on("mouseleave", mouseleave)
     })
 
   </script>
