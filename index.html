@@ -31,7 +31,7 @@
 
 <body>
 
-
+  <script src="https://d3js.org/d3.v4.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,302 +43,104 @@
   <div id="titleCont">
     <h1 id="title">Star Signs by Team</h1>
   </div>
-  <div id="chart">
-    <canvas id="myChart" width="400" height="400"></canvas>
+  <div id="my_dataviz">
+
   </div>
+  <!-- <div id="chart">
+    <canvas id="myChart" width="400" height="400"></canvas>
+  </div> -->
   <script>
 
-    fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/bbl.json').then(response => response.json()).then(data => {
-      fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/byteam.json').then(response => response.json()).then(teamdata => {
+    // set the dimensions and margins of the graph
+    var margin = { top: 10, right: 30, bottom: 20, left: 50 },
+      width = 660 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom;
+
+    // append the svg object to the body of the page
+    var svg = d3.select("#my_dataviz")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+    // Load data
+    Promise.all([
+      fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/bbl.json').then(response => response.json()),
+      fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/gh-pages/counts.json').then(response => response.json()),
+      fetch('https://raw.githubusercontent.com/lilygarfinkel/bsbl/main/bysign.json').then(response => response.json())
+    ]).then(([data, counts, bysign]) => {
 
 
-        var signs = [];
-        var total = [];
-        var counts = [];
-        s = []
+      // Prepare data
+      const sign = Object.keys(bysign);
+      const groups = Object.keys(bysign).map(key => ({key: key, data: bysign[key]}));
+    
 
-        var c = 0;
-        for (var sign in data) {
-          s.push(sign)
-          signs.push({ 'sign': sign, 'teams': {} })
-          for (var team in data[sign]) {
-            counts.push({ team, 'count': data[sign][team] })
-          }
-          signs[c]['teams'] = counts;
-          c += 1;
-          counts = []
-        }
-
-        totals = []
-        teams = []
-        count = []
-        c = 0;
-
-        for (team in teamdata) {
-          console.log(team)
-          teams.push({ 'team': team, 'data': {} })
-          for (sign in teamdata[team]) {
-            count.push(teamdata[team][sign])
-            teams[c]['data'] = count;
-          }
-          c += 1;
-          count = []
-        }
-
-        var angels = teams[0].data
-        var astros = teams[1].data
-        var athletics = teams[2].data
-        var bluejays = teams[3].data
-        var braves = teams[4].data
-        var brewers = teams[5].data
-        var cardinals = teams[6].data
-        var cubs = teams[7].data
-        var dbacks = teams[8].data
-        var dodgers = teams[9].data
-        var giants = teams[10].data
-        var guardians = teams[11].data
-        var mariners = teams[12].data
-        var marlins = teams[13].data
-        var mets = teams[14].data
-        var nationals = teams[15].data
-        var orioles = teams[16].data
-        var padres = teams[17].data
-        var phillies = teams[18].data
-        var pirates = teams[19].data
-        var rangers = teams[20].data
-        var rays = teams[21].data
-        var redsox = teams[22].data
-        var reds = teams[23].data
-        var rockies = teams[24].data
-        var royals = teams[25].data
-        var tigers = teams[26].data
-        var twins = teams[27].data
-        var whitesox = teams[28].data
-        var yankees = teams[29].data
-
-
-        const canvas = document.getElementById('myChart');
-
-        new Chart(canvas, {
-          type: 'bar',
-          data: {
-            labels: s,
-            datasets: [{
-              label: 'angels',
-              data: angels,
-              stack: 'stack 0',
-              backgroundColor: '#BA0021'
-            },
-            {
-              label: 'astros',
-              data: astros,
-              stack: 'stack 0',
-              backgroundColor: '#EB6E1F'
-            },
-            {
-              label: 'athletics',
-              data: athletics,
-              stack: 'stack 0',
-              backgroundColor: '#003831'
-            },
-            {
-              label: 'blue jays',
-              data: bluejays,
-              stack: 'stack 0',
-              backgroundColor: '#134A8E'
-            },
-            {
-              label: 'braves',
-              data: braves,
-              stack: 'stack 0',
-              backgroundColor: '#CE1141'
-            },
-            {
-              label: 'brewers',
-              data: brewers,
-              stack: 'stack 0',
-              backgroundColor: '#FFC52F'
-            },
-            {
-              label: 'cardinals',
-              data: cardinals,
-              stack: 'stack 0',
-              backgroundColor: '#C41E3A'
-            },
-            {
-              label: 'cubs',
-              data: cubs,
-              stack: 'stack 0',
-              backgroundColor: '#0E3386'
-            },
-            {
-              label: 'diamondbacks',
-              data: dbacks,
-              stack: 'stack 0',
-              backgroundColor: '#A71930'
-            },
-            {
-              label: 'dodgers',
-              data: dodgers,
-              stack: 'stack 0',
-              backgroundColor: '#005A9C'
-            },
-            {
-              label: 'giants',
-              data: giants,
-              stack: 'stack 0',
-              backgroundColor: '#FD5A1E'
-            },
-            {
-              label: 'guardians',
-              data: guardians,
-              stack: 'stack 0',
-              backgroundColor: '#E50022'
-            },
-            {
-              label: 'mariners',
-              data: mariners,
-              stack: 'stack 0',
-              backgroundColor: '#0C2C56'
-            },
-            {
-              label: 'marlins',
-              data: marlins,
-              stack: 'stack 0',
-              backgroundColor: '#00A3E0'
-            },
-            {
-              label: 'mets',
-              data: mets,
-              stack: 'stack 0',
-              backgroundColor: '#FF5910'
-            },
-            {
-              label: 'nationals',
-              data: nationals,
-              stack: 'stack 0',
-              backgroundColor: '#AB0003'
-            },
-            {
-              label: 'orioles',
-              data: orioles,
-              stack: 'stack 0',
-              backgroundColor: '#DF4601'
-            },
-            {
-              label: 'padres',
-              data: padres,
-              stack: 'stack 0',
-              backgroundColor: '#2F241D'
-            },
-            {
-              label: 'phillies',
-              data: phillies,
-              stack: 'stack 0',
-              backgroundColor: '#E81828'
-            },
-            {
-              label: 'pirates',
-              data: pirates,
-              stack: 'stack 0',
-              backgroundColor: '#FDB827'
-            },
-            {
-              label: 'rangers',
-              data: rangers,
-              stack: 'stack 0',
-              backgroundColor: '#003278'
-            },
-            {
-              label: 'red sox',
-              data: redsox,
-              stack: 'stack 0',
-              backgroundColor: '#BD3039'
-            },
-            {
-              label: 'reds',
-              data: reds,
-              stack: 'stack 0',
-              backgroundColor: '#C6011F'
-            },
-            {
-              label: 'rockies',
-              data: rockies,
-              stack: 'stack 0',
-              backgroundColor: '#330072'
-            },
-            {
-              label: 'royals',
-              data: royals,
-              stack: 'stack 0',
-              backgroundColor: '#004687'
-            },
-            {
-              label: 'tigers',
-              data: tigers,
-              stack: 'stack 0',
-              backgroundColor: '#FA4616'
-            },
-            {
-              label: 'twins',
-              data: twins,
-              stack: 'stack 0',
-              backgroundColor: '#002B5C'
-            },
-            {
-              label: 'white sox',
-              data: whitesox,
-              stack: 'stack 0',
-              backgroundColor: '#C4CED4'
-            },
-            {
-              label: 'yankees',
-              data: yankees,
-              stack: 'stack 0',
-              backgroundColor: '#0C2340',
-            }
-            ]
-          },
-
-          options: {
-            
-            scales: {
-              x: { stacked: true },
-              y: { stacked: true }
-            },
-            plugins: {
-              legend: {
-                display: false,
-                labels: {
-                  boxWidth: 15,
-                  boxHeight: 15,
-                }
-              },
-              tooltip: {
-                mode: 'index',
-                bodySpacing:1,
-                usePointStyle: true,
-                callbacks: {
-                  labelPointStyle: function (context) {
-                    return {
-                      pointStyle: 'circle',
-                      rotation: 0
-                    };
-                  },
-                  footer: function(items) {
-                    total = items.reduce((a, b) => a + b.parsed.y, 0);
-                    console.log(total)
-            return 'Total: ' + total
-          }
-                }
-              },
-            },
-
-          }
+      const group=[]
+      for (s in groups){
+        let g = {}
+        g['key'] = groups[s].key;
+        for (t in groups[s].data){
+         g[t] = groups[s].data[t];
 
         }
-        );
-      }).catch(error => console.error(error));
-    }).catch(error => console.error(error));
+        group.push(g)
+      }
+// console.log(group)
+//       console.log(sign)
+//       // console.log(team_data)
+//       console.log(groups)
+
+      var subgroups = ["angels", "astros", "athletics", "blue jays", "braves", "brewers", "cardinals", "cubs", " diamondbacks", "dodgers", "giants", "guardians", "mariners", "marlins", "mets", "nationals", "orioles", "padres", "pirates", "phillies", "rangers", "rays", "reds", "red sox", "rockies", "royals", "tigers", "twins", "white sox", "yankees"]
+      // console.log(subgroups)
+      // bySign.columns.slice(1)
+      // var groups1 = d3.map(bysign, function(d){return(d.key)}).keys()
+      console.log(group)
+      var x = d3.scaleBand()
+        .domain(sign)
+        .range([0, width])
+        .padding([0.2])
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x).tickSizeOuter(0));
+
+      // Add Y axis
+      var y = d3.scaleLinear()
+        .domain([0, 200])
+        .range([height, 0]);
+      svg.append("g")
+        .call(d3.axisLeft(y));
+
+      // color palette = one color per signs
+      var color = d3.scaleOrdinal()
+        .domain(subgroups)
+        .range(['#BA0021', '#EB6E1F', '#003831', '#134A8E', '#CE1141', '#FFC52F', '#C41E3A', '#0E3386', '#A71930', '#005A9C', '#FD5A1E', '#E50022', '#0C2C56', '#00A3E0', '#FF5910', '#AB0003', '#DF4601', '#2F241D', '#E81828', '#FDB827', '#003278', '#8FBCE6', '#377eb8', '#BD3039', '#BD3039', '#C6011F', '#BD3039', '#004687', '#FA4616', '#002B5C', '#C4CED4', '#0C2340'])
+
+      //stack the data? --> stack per signs
+      var stackGen = d3.stack()
+        .keys(subgroups)
+
+      var stackedData = stackGen(group)
+
+      console.log(stackedData)
+      // Show the bars
+      // }); 
+      svg.append("g")
+        .selectAll("g")
+        // Enter in the stack data = loop key per key = group per group
+        .data(stackedData)
+        .enter().append("g")
+        .attr("fill", function (d) {return color(d.key); })
+        .selectAll("rect")
+        // enter a second time = loop signs per signs to add all rectangles
+        .data(function (d) { console.log(d); return d; })
+          .enter().append("rect")
+          .attr("x", function (d) {if(typeof d.data === 'string'){return;}else{return x(d.data.key);}})
+          .attr("y", function (d) { if(Number.isNaN(y(d[1]))){return} else{ return y(d[1]);} })
+          .attr("height", function (d){if(Number.isNaN(y(d[1]))){return} else{return( y(d[0]) - y(d[1]));}})
+          .attr("width", x.bandwidth())
+    })
+
   </script>
 </body>
