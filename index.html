@@ -8,7 +8,7 @@
   }
 
   #titleCont {
-    width: 500px;
+    width: 100vw;
     justify-content: center;
     display: flex;
   }
@@ -18,6 +18,7 @@
     font-family: "Lilita One", sans-serif;
     font-weight: 400;
     font-style: normal;
+    font-size: 40px;
     color: deeppink;
     -webkit-text-stroke: 1px black;
 
@@ -26,6 +27,22 @@
   #chart {
     width: 500px;
     height: 500px;
+  }
+
+  #datacont{
+    display:flex;
+    flex-direction: row;
+  }
+
+  #teams{
+    width: 125px;
+    height:600px;
+    border: 1px solid deeppink;
+    border-radius: 5px;
+    background-color: deeppink;
+    display: flex;
+    text-align: center;
+    justify-content: center;
   }
 </style>
 
@@ -43,9 +60,13 @@
   <div id="titleCont">
     <h1 id="title">Star Signs by Team</h1>
   </div>
-  <div id="my_dataviz">
+  <div id="datacont">
+    <div id="my_dataviz">
 
+    </div>
+    <div id="teams">data:</div>
   </div>
+
   <!-- <div id="chart">
     <canvas id="myChart" width="400" height="400"></canvas>
   </div> -->
@@ -53,7 +74,7 @@
 
     // set the dimensions and margins of the graph
     var margin = { top: 10, right: 30, bottom: 20, left: 50 },
-      width = 660 - margin.left - margin.right,
+      width = 600 - margin.left - margin.right,
       height = 600 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
@@ -87,16 +108,17 @@
         }
         group.push(g)
       }
-      // console.log(group)
+       console.log(group)
+
       //       console.log(sign)
       //       // console.log(team_data)
       //       console.log(groups)
 
-      var subgroups = ["angels", "astros", "athletics", "blue jays", "braves", "brewers", "cardinals", "cubs", " diamondbacks", "dodgers", "giants", "guardians", "mariners", "marlins", "mets", "nationals", "orioles", "padres", "pirates", "phillies", "rangers", "rays", "reds", "red sox", "rockies", "royals", "tigers", "twins", "white sox", "yankees"]
+      var subgroups = ["angels", "astros", "athletics", "bluejays", "braves", "brewers", "cardinals", "cubs", "diamondbacks", "dodgers", "giants", "guardians", "mariners", "marlins", "mets", "nationals", "orioles", "padres", "pirates", "phillies", "rangers", "rays", "reds", "redsox", "rockies", "royals", "tigers", "twins", "whitesox", "yankees"]
       // console.log(subgroups)
       // bySign.columns.slice(1)
       // var groups1 = d3.map(bysign, function(d){return(d.key)}).keys()
-      console.log(group)
+      // console.log(group)
       var x = d3.scaleBand()
         .domain(sign)
         .range([0, width])
@@ -107,7 +129,7 @@
 
       // Add Y axis
       var y = d3.scaleLinear()
-        .domain([0, 200])
+        .domain([0, 115])
         .range([height, 0]);
       svg.append("g")
         .call(d3.axisLeft(y));
@@ -115,8 +137,30 @@
       // color palette = one color per signs
       var color = d3.scaleOrdinal()
         .domain(subgroups)
-        .range(['#BA0021', '#EB6E1F', '#003831', '#134A8E', '#CE1141', '#FFC52F', '#C41E3A', '#0E3386', '#A71930', '#005A9C', '#FD5A1E', '#E50022', '#0C2C56', '#00A3E0', '#FF5910', '#AB0003', '#DF4601', '#2F241D', '#E81828', '#FDB827', '#003278', '#8FBCE6', '#377eb8', '#BD3039', '#BD3039', '#C6011F', '#BD3039', '#004687', '#FA4616', '#002B5C', '#C4CED4', '#0C2340'])
+        .range(['#BA0021', '#EB6E1F', '#003831', '#134A8E', '#CE1141', '#FFC52F', '#C41E3A', '#0E3386', '#A71930', '#005A9C', '#FD5A1E', '#E50022', '#0C2C56', '#00A3E0', '#FF5910', '#AB0003', '#DF4601', '#2F241D', '#E81828', '#FDB827', '#003278', '#8FBCE6', '#377eb8', '#BD3039', 'purple', '#C6011F', 'orange', '#004687', '#C0c0c0', '#002B5C'])
 
+      var total = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+      for (e in groups) {
+        //  console.log(groups[e])
+        for (d in groups[e].data) {
+          var smallarr = groups[e].data[d]
+          // console.log(groups[e].data[d])
+          if (d === 0) {
+            total[e] = 0;
+          }
+          // console.log(total[e])
+          total[e] = total[e] + groups[e].data[d];
+          // console.log(total[e])
+        }
+      }
+
+      console.log(total)
+
+      var tot = d3.scaleOrdinal()
+        .domain(sign)
+        .range(total)
+      // console.log(tot)
       //stack the data? --> stack per signs
       var stackGen = d3.stack()
         .keys(subgroups)
@@ -139,17 +183,39 @@
       var mouseover = function (d) {
         var subgroupName = d3.select(this.parentNode).datum().key;
         var subgroupValue = d.data[subgroupName];
+        var totalVal = tot(d.data.key);
+
+        // console.log(totalVal)
+        var container = document.getElementById("teams");
+        var text =''
+        console.log(d.data)
+          for (i in d.data){
+            console.log(i);
+            console.log(d.data[i])
+            text =text + " " + i + ' : ' + d.data[i] + '<br/>'
+            // text.push('<br>')
+          }
+       
+        container.innerHTML = text
+
+        // d3.selectAll(".myRect").style("opacity", 0.2)
+        d3.selectAll("." + subgroupName).style("opacity", 1)
         tooltip
-          .html("team: " + subgroupName + "<br>" + "count: " + subgroupValue)
+          .html("team: " + subgroupName + "<br>" + "count: " + subgroupValue + "<br>" + "total: " + totalVal)
           .style("opacity", 1)
       }
       var mousemove = function (d) {
+        var subgroupName = d3.select(this.parentNode).datum().key;
         tooltip
           .style("left", (d3.mouse(this)[0] + 90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
           .style("top", (d3.mouse(this)[1]) + "px")
-          .style("width", '100px')
+          .style("width", '150px')
+          .style("background-color", color(subgroupName))
+          .style('color', 'white')
       }
       var mouseleave = function (d) {
+        d3.selectAll(".myRect")
+          .style("opacity", 0.8)
         tooltip
           .style("opacity", 0)
       }
@@ -162,18 +228,32 @@
         .data(stackedData)
         .enter().append("g")
         .attr("fill", function (d) { return color(d.key); })
+        .attr("class", function (d) { return "myRect " + d.key }) // Add a class to each subgroup: their name
+       
+      .text(function(d) { return tot(sign.indexOf(d)); })
         .selectAll("rect")
         // enter a second time = loop signs per signs to add all rectangles
-        .data(function (d) { console.log(d); return d; })
+        .data(function (d) { ;return d; })
         .enter().append("rect")
         .attr("x", function (d) { if (typeof d.data === 'string') { return; } else { return x(d.data.key); } })
         .attr("y", function (d) { if (Number.isNaN(y(d[1]))) { return } else { return y(d[1]); } })
         .attr("height", function (d) { if (Number.isNaN(y(d[1]))) { return } else { return (y(d[0]) - y(d[1])); } })
         .attr("width", x.bandwidth())
         .on("mouseover", mouseover)
-      .on("mousemove", mousemove)
-      .on("mouseleave", mouseleave)
+        .on("mousemove", mousemove)
+        .on("mouseleave", mouseleave);
+
+    //     svg.append("g").selectAll("g")
+    //     .data(sign)
+    //     .enter()        
+    //  .append("text")
+    //    .attr("x", function(d) { return(x(d)); })
+    //     .attr("y", function(d) {return(y(d[1])) ; }) // Center text
+    //         .attr("dy", "1em")
+    //   .text(function(d) { return tot(sign.indexOf(d)); });
+        
     })
+
 
   </script>
 </body>
